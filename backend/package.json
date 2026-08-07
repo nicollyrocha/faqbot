@@ -2,22 +2,23 @@
   "name": "backend",
   "version": "1.0.0",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
+    "dev": "node ./node_modules/tsx/dist/cli.mjs watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js"
   },
   "dependencies": {
-    "@prisma/client": "^7.9.1",
+    "@prisma/client": "6",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "fuse.js": "^7.5.0",
     "string-similarity": "^4.0.4"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/node": "^26.1.2",
-    "prisma": "^7.9.1",
+    "prisma": "6",
     "tsx": "^4.23.9",
     "typescript": "^7.0.2"
   }

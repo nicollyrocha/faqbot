@@ -8,4 +8,6 @@ RUN yarn install
 
 COPY . .
 
-CMD ["yarn", "dev"]
+RUN yarn prisma generate
+
+CMD ["sh", "-c", "yarn prisma db push && yarn dev"]

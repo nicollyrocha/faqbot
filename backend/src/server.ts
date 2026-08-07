@@ -1,12 +1,5 @@
-import express = require("express");
-
-const app = express();
-
-app.use(express.json());
-
-app.get("/", (_, res) => {
-  res.json({ message: "API running" });
-});
+import "dotenv/config";
+import app from "./app";
 
 const PORT = 3000;
 

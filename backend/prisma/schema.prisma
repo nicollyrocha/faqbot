@@ -4,8 +4,9 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider      = "prisma-client"
+  output        = "../generated/prisma"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
@@ -22,20 +23,22 @@ model Faq {
   category  String
 
   createdAt DateTime @default(now())
-
+ 
   interactions Interaction[]
 }
 
 model Interaction {
-  id        Int      @id @default(autoincrement())
+  id           Int      @id @default(autoincrement())
 
-  question  String
-  response  String?
+  sessionId    String
+
+  question     String
+  response     String?
 
   matchedFaqId Int?
   matchedFaq   Faq? @relation(fields: [matchedFaqId], references: [id])
 
-  foundAnswer Boolean @default(false)
+  foundAnswer  Boolean @default(false)
 
-  createdAt DateTime @default(now())
+  createdAt    DateTime @default(now())
 }
