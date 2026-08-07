@@ -5,6 +5,7 @@ export const TextInput = ({
   className = '',
   label,
   required = false,
+  type = 'text',
 }: {
   value: string
   onChange: (value: string) => void
@@ -12,6 +13,7 @@ export const TextInput = ({
   className?: string
   label?: string
   required?: boolean
+  type?: string
 }) => {
   return (
     <div className="flex flex-col gap-1">
@@ -20,7 +22,7 @@ export const TextInput = ({
       </div>
       <input
         required={required}
-        type="text"
+        type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className={`border border-white/50 rounded-lg p-2 text-white text-sm font-light bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 ${className}`}

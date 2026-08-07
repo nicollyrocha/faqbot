@@ -14,7 +14,7 @@ type SidebarProps = {
 
 export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const navigate = useNavigate()
-  const isAdmin = localStorage.getItem('isAdmin') === 'true'
+  const isAdmin = Boolean(localStorage.getItem('adminToken'))
 
   const handleNavigation = (path: string) => {
     navigate(path)

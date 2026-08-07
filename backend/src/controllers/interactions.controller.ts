@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import interactionService = require("../services/interaction.service");
+import * as interactionService from "../services/interaction.service";
 import type { InteractionCreateData } from "../services/interaction.service";
 
 type CreateInteractionBody = {

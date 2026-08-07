@@ -7,15 +7,18 @@ import { TextArea } from '../components/TextArea'
 import { MessageItem } from '../components/MessageItem'
 import { Modal } from '../components/Modal'
 import { Skeleton } from '../components/Skeleton'
+import { TextInput } from '../components/TextInput'
 
 export const Home = () => {
   const [msg, setMsg] = useState('')
   const chatEndRef = useRef<HTMLDivElement | null>(null)
+  const [adminAccessKey, setAdminAccessKey] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(
-    () => localStorage.getItem('isAdmin') === null,
+    () => localStorage.getItem('adminToken') === null,
   )
   const [messages, setMessages] = useState<Message[]>([])
   const [sendError, setSendError] = useState<string | null>(null)
+  const [adminError, setAdminError] = useState<string | null>(null)
 
   const apiBaseUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:3001'
 
@@ -29,6 +32,38 @@ export const Home = () => {
 
     return storedSessionId
   })
+
+  const handleAdminLogin = async () => {
+    setAdminError(null)
+
+    if (!adminAccessKey.trim()) {
+      setAdminError('Informe a chave de acesso.')
+      return
+    }
+
+    const response = await fetch(`${apiBaseUrl}/auth/admin/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        accessKey: adminAccessKey,
+      }),
+    })
+
+    if (!response.ok) {
+      const errorData = (await response.json().catch(() => null)) as {
+        message?: string
+      } | null
+
+      setAdminError(errorData?.message ?? 'Chave inválida.')
+      return
+    }
+
+    const data = (await response.json()) as { token: string }
+    localStorage.setItem('adminToken', data.token)
+    window.location.reload()
+  }
 
   const {
     data: historyData = [],
@@ -235,24 +270,31 @@ export const Home = () => {
         onClose={() => setIsModalOpen(false)}
         title="Você é um administrador?"
       >
-        <div className="flex gap-5">
-          <Button
-            onClick={() => {
-              localStorage.setItem('isAdmin', 'true')
-              setIsModalOpen(false)
-            }}
-          >
-            Sim
-          </Button>
-          <Button
-            className="bg-red-500 hover:bg-red-700"
-            onClick={() => {
-              localStorage.setItem('isAdmin', 'false')
-              setIsModalOpen(false)
-            }}
-          >
-            Não
-          </Button>
+        <div className="flex flex-col gap-4">
+          <TextInput
+            label="Chave de acesso"
+            value={adminAccessKey}
+            onChange={setAdminAccessKey}
+            placeholder="Digite a chave de administrador"
+            type="password"
+            required
+          />
+
+          {adminError && (
+            <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-100">
+              {adminError}
+            </div>
+          )}
+
+          <div className="flex gap-5">
+            <Button onClick={handleAdminLogin}>Acessar área admin</Button>
+            <Button
+              className="bg-red-500 hover:bg-red-700"
+              onClick={() => setIsModalOpen(false)}
+            >
+              Continuar como usuário
+            </Button>
+          </div>
         </div>
       </Modal>
       <div className="text-2xl font-bold">Chatbot</div>

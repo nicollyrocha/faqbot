@@ -29,6 +29,12 @@ type Faq = {
   category: string
 }
 
+type UnansweredQuestionRow = {
+  question: string
+  count: number
+  lastSeen: string
+}
+
 export const DashboardPage = () => {
   const apiBaseUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:3001'
 
@@ -135,6 +141,59 @@ export const DashboardPage = () => {
       value,
     }))
   }, [faqs, interactions])
+
+  const unansweredQuestions = useMemo<UnansweredQuestionRow[]>(() => {
+    const questionStats = interactions.reduce<
+      Record<string, { count: number; lastSeen: string }>
+    >((accumulator, interaction) => {
+      if (interaction.matchedFaqId !== null) {
+        return accumulator
+      }
+
+      const normalizedQuestion = interaction.question.trim()
+
+      if (!normalizedQuestion) {
+        return accumulator
+      }
+
+      const current = accumulator[normalizedQuestion] ?? {
+        count: 0,
+        lastSeen: interaction.createdAt,
+      }
+
+      accumulator[normalizedQuestion] = {
+        count: current.count + 1,
+        lastSeen:
+          new Date(interaction.createdAt).getTime() >
+          new Date(current.lastSeen).getTime()
+            ? interaction.createdAt
+            : current.lastSeen,
+      }
+
+      return accumulator
+    }, {})
+
+    return Object.entries(questionStats)
+      .map(([question, stats]) => ({
+        question,
+        count: stats.count,
+        lastSeen: stats.lastSeen,
+      }))
+      .sort((left, right) => right.count - left.count)
+  }, [interactions])
+
+  const unansweredQuestionsRows = useMemo(
+    () =>
+      unansweredQuestions.map((item) => [
+        item.question,
+        String(item.count),
+        new Intl.DateTimeFormat('pt-BR', {
+          dateStyle: 'short',
+          timeStyle: 'short',
+        }).format(new Date(item.lastSeen)),
+      ]),
+    [unansweredQuestions],
+  )
 
   const frequentQuestionsRows = useMemo(
     () =>
@@ -338,6 +397,33 @@ export const DashboardPage = () => {
           data={timeSeries}
           title="Evolução das consultas ao longo do tempo"
         />
+
+        <Card className="w-full overflow-hidden border border-white/10 bg-linear-to-br from-[#111827] via-[#1f2937] to-[#030712] p-4 shadow-[0_20px_60px_rgba(2,6,23,0.28)] sm:p-6">
+          <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
+            <div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-orange-200/80">
+                Lacunas do FAQ
+              </div>
+              <div className="mt-1 text-lg font-semibold text-white">
+                Perguntas sem resposta cadastrada
+              </div>
+            </div>
+            <div className="rounded-full border border-orange-400/20 bg-orange-400/10 px-3 py-1 text-xs font-medium text-orange-200">
+              {unansweredQuestionsRows.length} perguntas
+            </div>
+          </div>
+
+          {unansweredQuestionsRows.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-white/10 bg-white/5 px-4 py-6 text-sm text-slate-300">
+              Nenhuma pergunta sem resposta foi registrada.
+            </div>
+          ) : (
+            <Table
+              headers={['Pergunta', 'Ocorrências', 'Última vez vista']}
+              rows={unansweredQuestionsRows}
+            />
+          )}
+        </Card>
 
         <Card className="w-full overflow-hidden border border-white/10 bg-linear-to-br from-[#0f172a] via-[#10234d] to-[#030712] p-4 shadow-[0_20px_60px_rgba(2,6,23,0.28)] sm:p-6">
           <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">

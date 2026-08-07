@@ -27,14 +27,11 @@ export async function findFaq(userQuestion: string) {
     ignoreLocation: true,
   });
 
-
   const result = fuse.search(normalizedQuestion);
-
 
   if (!result.length) {
     return null;
   }
-
 
   return result[0]?.item;
 }

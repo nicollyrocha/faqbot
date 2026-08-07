@@ -3,7 +3,6 @@ import { findFaq } from "../services/chat.service";
 import { createInteraction } from "../services/interaction.service";
 
 export async function chat(req: Request, res: Response) {
-  console.log('entrou')
   const { sessionId, question } = req.body;
 
   if (typeof sessionId !== "string" || !sessionId.trim()) {
@@ -14,12 +13,8 @@ export async function chat(req: Request, res: Response) {
     return res.status(400).json({ message: "question é obrigatória" });
   }
 
-  console.log('question', question);
-
   const faq = await findFaq(question);
-  console.log('faq', faq);
   const answer = faq?.answer ?? "Não encontrei uma resposta.";
-  console.log('answer', answer);
 
   const interactionData = {
     sessionId,

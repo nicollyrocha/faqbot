@@ -21,10 +21,13 @@ services:
     - ./backend:/app
     - /app/node_modules
     ports:
-      - "3001:3000"
+      - "3001:3001"
     depends_on:
       - postgres
     environment:
+      PORT: 3001
+      ADMIN_ACCESS_KEY: "123456"
+      ADMIN_SESSION_SECRET: "faqbot-session-secret"
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/chatbot
 
   postgres:
