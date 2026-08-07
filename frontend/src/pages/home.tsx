@@ -297,7 +297,8 @@ export const Home = () => {
           </div>
         </div>
       </Modal>
-      <div className="text-2xl font-bold">Chatbot</div>
+
+      <div className="text-2xl font-bold text-white sm:text-3xl">Chatbot</div>
 
       <div className="text-md font-light text-gray-400 mb-4">
         Tire suas dúvidas com nosso assistente virtual.
